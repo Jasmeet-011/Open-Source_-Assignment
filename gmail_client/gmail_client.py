@@ -40,7 +40,7 @@ class GmailClient(Client):
             try:
                 with open(self.token_file, "r") as token_file:
                     creds_info = json.load(token_file)
-                    creds = Credentials.from_authorized_user_info(creds_info)  # type: ignore[no-untyped-call]
+                    creds = Credentials.from_authorized_user_info(creds_info) # type: ignore
             except (json.JSONDecodeError, ValueError) as e:
                 logger.error(f"Error loading token file: {e}")
 

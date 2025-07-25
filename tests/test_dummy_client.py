@@ -3,7 +3,7 @@ from typing import Iterator, Optional
 
 
 class DummyMessage(Message):
-    def __init__(self):
+    def __init__(self) -> None:
         self._id = "1"
         self._from = "sender@example.com"
         self._to = "receiver@example.com"
@@ -41,23 +41,23 @@ class DummyClient(Client):
         return message_id == "1"
 
 
-def test_send_email():
+def test_send_email() -> None:
     client = DummyClient()
     assert client.send_message("a@b.com", "Hi", "Hello") is True
 
 
-def test_read_email():
+def test_read_email() -> None:
     client = DummyClient()
     msg = client.get_message("1")
     assert msg is not None
     assert msg.subject == "Test Subject"
 
 
-def test_delete_email_success():
+def test_delete_email_success() -> None:
     client = DummyClient()
     assert client.delete_message("1") is True
 
 
-def test_delete_email_failure():
+def test_delete_email_failure() -> None:
     client = DummyClient()
     assert client.delete_message("999") is False
