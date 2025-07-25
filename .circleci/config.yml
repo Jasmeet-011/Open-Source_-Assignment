@@ -47,12 +47,12 @@ jobs:
       - run:
           name: Verify Tests Exist
           command: |
-            uv pip run pytest --collect-only
+            uv run pytest --collect-only
 
       - run:
           name: Run Tests with Coverage
           command: |
-            uv pip run pytest --cov=gmail_client --cov=tests --cov-report=xml --cov-report=html \
+            uv run pytest --cov=gmail_client --cov=tests --cov-report=xml --cov-report=html \
             --junitxml=test-results/junit.xml --cov-config=pyproject.toml | tee test-results/output.log
 
       - run:
