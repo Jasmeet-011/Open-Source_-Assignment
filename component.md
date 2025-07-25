@@ -10,6 +10,7 @@ The Gmail Client component is responsible for sending emails, retrieving inbox m
 
 ### Directory Structure
 
+```
 gmail_client/
 │ ├── **init**.py # Public exports and interface registration
 │ ├── gmail_client.py # GmailClient implementation of the Client interface
@@ -23,8 +24,9 @@ mail_client/
 tests/
 │ ├── dummy_client.py # Dummy implementation of Client for safe testing
 │ └── test_dummy_client.py # Unit tests for DummyClient
+```
 
-Each component follows a structure where:
+### Each component follows a structure where:
 
 - **Implementation files** (gmail_client/\*.py): Gmail-specific logic.
 
