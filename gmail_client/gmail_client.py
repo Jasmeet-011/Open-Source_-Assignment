@@ -55,7 +55,7 @@ class GmailClient(Client):
 
             if creds is not None:
                 with open(self.token_file, "w") as token:
-                    token.write(creds.to_json())  # type: ignore[no-untyped-call]
+                    token.write(creds.to_json())  
 
         return build("gmail", "v1", credentials=creds)
 
