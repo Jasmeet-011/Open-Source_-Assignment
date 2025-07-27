@@ -1,6 +1,6 @@
 from gmail_client.interface import Client, Message, Attachment
 from typing import Iterator, Optional
-import os.path
+import os
 import base64
 import json
 import logging
@@ -36,36 +36,42 @@ class GmailClient(Client):
     def _get_gmail_service(self) -> Resource:
         creds: Optional[Credentials] = None
 
-        # Try loading token from local file
-        if os.path.exists(self.token_file):
+        # Priority 1: Environment variable for CI/CD
+        credentials_env = os.getenv("GOOGLE_CREDENTIALS_JSON")
+        if credentials_env:
+            try:
+                creds_info = json.loads(credentials_env)
+                creds = Credentials.from_authorized_user_info(creds_info, self.SCOPES)
+                logger.info("Loaded credentials from environment.")
+            except Exception as e:
+                logger.error(f"Failed to load credentials from env: {e}")
+                raise
+
+        # Priority 2: Local token.json for dev
+        elif os.path.exists(self.token_file):
             try:
                 with open(self.token_file, "r") as token_file:
                     creds_info = json.load(token_file)
-                    creds = Credentials.from_authorized_user_info(creds_info)  # type: ignore
-            except (json.JSONDecodeError, ValueError) as e:
+                    creds = Credentials.from_authorized_user_info(creds_info, self.SCOPES)
+                    logger.info("Loaded credentials from local token file.")
+            except Exception as e:
                 logger.error(f"Error loading token file: {e}")
 
+        # Priority 3: OAuth flow if needed (for first-time local auth)
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())  # type: ignore[no-untyped-call]
+                logger.info("Refreshed expired credentials.")
             else:
-                credentials_json_env = os.getenv("GOOGLE_CREDENTIALS_JSON")
-                if credentials_json_env:
-                    try:
-                        creds_dict = json.loads(credentials_json_env)
-                        flow = InstalledAppFlow.from_client_config(creds_dict, self.SCOPES)
-                    except json.JSONDecodeError as e:
-                        logger.error(f"Failed to load credentials from environment variable: {e}")
-                        raise
-                else:
-                    flow = InstalledAppFlow.from_client_secrets_file(
-                        self.credentials_file, self.SCOPES
-                    )
+                flow = InstalledAppFlow.from_client_secrets_file(self.credentials_file, self.SCOPES)
                 creds = flow.run_local_server(port=0)
+                logger.info("Ran OAuth flow to get new credentials.")
 
-            if creds and self.token_file:
+            # Save for next time
+            if creds:
                 with open(self.token_file, "w") as token:
                     token.write(creds.to_json())
+                    logger.info("Saved new token file locally.")
 
         return build("gmail", "v1", credentials=creds)
 
@@ -78,11 +84,13 @@ class GmailClient(Client):
                 .execute()
             )
             messages = results.get("messages", [])
+
             for message in messages:
                 msg_id = message["id"]
                 msg = self._get_message_by_id(msg_id)
                 if msg:
                     yield msg
+
         except HttpError as error:
             logger.error(f"An error occurred while fetching messages: {error}")
 
@@ -150,11 +158,9 @@ class GmailClient(Client):
             return False
 
     def get_message_by_id(self, message_id: str) -> Optional[Message]:
-        """Public method to fetch message by ID."""
         return self._get_message_by_id(message_id)
 
     def mark_as_read(self, message_id: str) -> bool:
-        """Mark an email as read (remove 'UNREAD' label)."""
         try:
             self.service.users().messages().modify(
                 userId="me",
