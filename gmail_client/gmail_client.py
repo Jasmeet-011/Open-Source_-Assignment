@@ -41,7 +41,7 @@ class GmailClient(Client):
         if credentials_env:
             try:
                 creds_info = json.loads(credentials_env)
-                creds = Credentials.from_authorized_user_info(creds_info, self.SCOPES)
+                creds = Credentials.from_authorized_user_info(creds_info, self.SCOPES) # type: ignore[no-untyped-call]
                 logger.info("Loaded credentials from environment.")
             except Exception as e:
                 logger.error(f"Failed to load credentials from env: {e}")
@@ -52,7 +52,7 @@ class GmailClient(Client):
             try:
                 with open(self.token_file, "r") as token_file:
                     creds_info = json.load(token_file)
-                    creds = Credentials.from_authorized_user_info(creds_info, self.SCOPES)
+                    creds = Credentials.from_authorized_user_info(creds_info, self.SCOPES) # type: ignore[no-untyped-call]
                     logger.info("Loaded credentials from local token file.")
             except Exception as e:
                 logger.error(f"Error loading token file: {e}")
