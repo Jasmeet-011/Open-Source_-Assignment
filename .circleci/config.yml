@@ -56,6 +56,11 @@ jobs:
             --junitxml=test-results/junit.xml --cov-config=pyproject.toml | tee test-results/output.log
 
       - run:
+          name: Convert test results to CSV
+          command: |
+            python tools/convert_junit_to_csv.py
+
+      - run:
           name: Check Test Results
           command: |
             if grep -q 'FAILED' test-results/output.log; then
@@ -73,6 +78,9 @@ jobs:
 
       - store_artifacts:
           path: test-results/output.log
+
+      - store_artifacts:
+          path: test-results/result.csv # ✅ CSV artifact
 
 workflows:
   version: 2
