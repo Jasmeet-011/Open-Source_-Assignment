@@ -36,11 +36,12 @@ class GmailClient(Client):
     def _get_gmail_service(self) -> Resource:
         creds: Optional[Credentials] = None
 
+        # Try loading token from local file
         if os.path.exists(self.token_file):
             try:
                 with open(self.token_file, "r") as token_file:
                     creds_info = json.load(token_file)
-                    creds = Credentials.from_authorized_user_info(creds_info) # type: ignore
+                    creds = Credentials.from_authorized_user_info(creds_info)  # type: ignore
             except (json.JSONDecodeError, ValueError) as e:
                 logger.error(f"Error loading token file: {e}")
 
@@ -48,14 +49,23 @@ class GmailClient(Client):
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())  # type: ignore[no-untyped-call]
             else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    self.credentials_file, self.SCOPES
-                )
+                credentials_json_env = os.getenv("GOOGLE_CREDENTIALS_JSON")
+                if credentials_json_env:
+                    try:
+                        creds_dict = json.loads(credentials_json_env)
+                        flow = InstalledAppFlow.from_client_config(creds_dict, self.SCOPES)
+                    except json.JSONDecodeError as e:
+                        logger.error(f"Failed to load credentials from environment variable: {e}")
+                        raise
+                else:
+                    flow = InstalledAppFlow.from_client_secrets_file(
+                        self.credentials_file, self.SCOPES
+                    )
                 creds = flow.run_local_server(port=0)
 
-            if creds is not None:
+            if creds and self.token_file:
                 with open(self.token_file, "w") as token:
-                    token.write(creds.to_json())  
+                    token.write(creds.to_json())
 
         return build("gmail", "v1", credentials=creds)
 
@@ -68,13 +78,11 @@ class GmailClient(Client):
                 .execute()
             )
             messages = results.get("messages", [])
-
             for message in messages:
                 msg_id = message["id"]
                 msg = self._get_message_by_id(msg_id)
                 if msg:
                     yield msg
-
         except HttpError as error:
             logger.error(f"An error occurred while fetching messages: {error}")
 
