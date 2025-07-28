@@ -1,4 +1,4 @@
-from gmail_client.interface import Message
+from .interface import Message
 import html2text
 import logging
 import base64
