@@ -13,7 +13,7 @@ This repository provides a modular, testable Gmail client implemented in Python 
 5. **✅ CI/CD Integration:** CircleCI pipeline with linting, type-checking, and test coverage.
 6. **🧼 Strict Type Safety:** mypy enforced across the codebase.
 
-## ** Project Structure**
+## **Project Structure**
 
 ```
 .
