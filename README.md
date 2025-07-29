@@ -31,6 +31,12 @@ This repository provides a modular, testable Gmail client implemented in Python 
 ├── tests/
 │   ├── test_integration.py
 │   └── test_end_to_end.py
+│   └── test_end_to_end.py
+└── test-results/
+│   ├── junit.xml                # Pytest JUnit test result file
+│   └── result.csv               # Created after running the file in tools folder
+├── tools/                       # Utility scripts
+│   └── convert_junit_to_csv.py  # Converts test results to CSV
 ├── credentials.json
 ├── token.json
 ├── pyproject.toml
@@ -88,6 +94,15 @@ uv run pytest
 uv run pytest --cov=gmail_client --cov=tests --cov-report=html
 
 ```
+
+**To convert the JUnit results to CSV:**
+
+```
+uv run tools/convert_junit_to_csv.py
+
+```
+
+The output file will be saved at: **test-results/result.csv**
 
 Open htmlcov/index.html in your browser to view detailed coverage
 

@@ -27,6 +27,8 @@ gmail_client/
 tests/
 │ ├── test_integration.py # Integration tests for GmailClient behavior
 │ └── test_end_to_end.py # E2E pipeline for full email flow
+├── tools/                       # Utility scripts
+│   └── convert_junit_to_csv.py  # Converts test results to CSV
 ```
 
 ---
