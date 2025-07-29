@@ -4,7 +4,7 @@ from typing import Optional
 import base64
 import mimetypes
 
-from .interface import Message, Attachment, Client, create_attachment
+from gmail_client.src.interface import Message, Attachment, Client, create_attachment
 from .gmail_client import GmailClient
 from .gmail_message import GmailMessage
 from .gmail_attachment import GmailAttachment

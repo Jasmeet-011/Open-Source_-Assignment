@@ -2,7 +2,7 @@
 
 import pytest
 from gmail_client.src.gmail_client import GmailClient
-from gmail_client.src.interface import Message
+# from gmail_client.src.interface import Message
 
 @pytest.fixture(scope="module")
 def gmail_client() -> GmailClient:

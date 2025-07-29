@@ -1,4 +1,4 @@
-from .interface import Attachment
+from gmail_client.src.interface import Attachment
 import base64
 import binascii
 import mimetypes

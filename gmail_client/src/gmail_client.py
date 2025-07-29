@@ -1,4 +1,4 @@
-from .interface import Client, Message, Attachment
+from gmail_client.src.interface import Client, Message, Attachment
 from typing import Iterator, Optional
 import os
 import base64
